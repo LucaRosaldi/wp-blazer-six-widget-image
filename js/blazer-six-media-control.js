@@ -40,8 +40,8 @@ jQuery(function($) {
 		frame, title, updateText, $control, $controlTarget;
 	
 	$('#wpbody').on('click', '.blazersix-media-control-choose', function(e) {
-		var options, targetSelector,
-			mediaIds = false;
+		var mediaIds = false,
+			attachment, options, targetSelector;
 		
 		e.preventDefault();
 		
@@ -67,12 +67,15 @@ jQuery(function($) {
 		title = $control.data('title') || BlazerSixMediaControl.frameTitle;
 		updateText = $control.data('update-text') || BlazerSixMediaControl.frameUpdateText;
 		
+		// Make sure the attachment is available when the media frame opens.
+		// @see https://core.trac.wordpress.org/ticket/22494
+		// @todo Account for multiple ids.
+		attachment = Attachment.get( mediaIds );
+		attachment.fetch();
+		
 		if ( frame ) {
 			if ( mediaIds ) {
-				// Select the correct attachment(s) when the frame opens.
-				// @todo https://core.trac.wordpress.org/ticket/22494
-				// @todo Account for multiple ids.
-				frame.state().get('selection').add( Attachment.get( mediaIds ) );
+				frame.state().get('selection').add( attachment );
 			} else {
 				frame.state().get('selection').clear();
 			}
@@ -91,7 +94,7 @@ jQuery(function($) {
 		};
 		
 		if ( mediaIds ) {
-			options.selection = [ Attachment.get( mediaIds ) ];
+			options.selection = [ attachment ];
 		}
 		
 		frame = wp.media( options );
