@@ -135,7 +135,7 @@ class Blazer_Six_Widget_Image_Loader {
 		?>
 		<script type="text/javascript">
 		jQuery(function($) {
-			$('#wpbody').on('blazersixMediaControl.selectionChange', '.blazersix-media-control', function( e, selection, test ) {
+			$('#wpbody').on('selectionChange.blazersixMediaControl', '.blazersix-media-control', function( e, selection, test ) {
 				var $control = $( e.target ),
 					$sizeField = $control.closest('.blazersix-widget-image-form').find('select.image-size'),
 					model = selection.first(),

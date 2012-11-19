@@ -112,7 +112,7 @@ jQuery(function($) {
 							$controlTarget.val( selection.pluck('id') );
 						}
 						
-						$control.trigger( 'blazersixMediaControl.selectionChange', [ selection ] );
+						$control.trigger( 'selectionChange.blazersixMediaControl', [ selection ] );
 					}
 				}
 			});
