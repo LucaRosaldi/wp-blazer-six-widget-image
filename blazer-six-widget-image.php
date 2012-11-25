@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name: The Eminently Fashionable, Cacheable Image Widget Thingamajig
- * Plugin URI: http://github.com/bradyvercher/blazer-six-image-widget/
- * Description: A simple, configurable, filterable image widget for cats in hats. It's flexible, too!
+ * Plugin Name: Blazer Six Image Widget
+ * Plugin URI: https://github.com/bradyvercher/wp-blazer-six-widget-image
+ * Description: A simple image widget utilizing the new WordPress media manager.
  * Version: 0.1-beta
  * Author: Blazer Six, Inc.
  * Author URI: http://www.blazersix.com/
@@ -29,7 +29,6 @@
  * @copyright Copyright (c) 2012, Blazer Six, Inc.
  * @license http://www.gnu.org/licenses/gpl-2.0.html
  *
- * @todo Change the name and description. It's beta on beta, or something.
  * @todo Consider how to package as an include (paths need to be configurable).
  */
 

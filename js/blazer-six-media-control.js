@@ -41,11 +41,13 @@ jQuery(function($) {
 	
 	$('#wpbody').on('click', '.blazersix-media-control-choose', function(e) {
 		var mediaIds = false,
-			attachment, options, targetSelector;
+			attachment, options, selectedIds, targetSelector;
 		
 		e.preventDefault();
 		
 		$control = $(this).closest('.blazersix-media-control');
+		title = $control.data('title') || BlazerSixMediaControl.frameTitle;
+		updateText = $control.data('update-text') || BlazerSixMediaControl.frameUpdateText;
 		
 		targetSelector = $control.data('target') || '.blazersix-media-control-target';
 		if ( 0 === targetSelector.indexOf('#') ) {
@@ -57,21 +59,17 @@ jQuery(function($) {
 		}
 		
 		if ( $controlTarget.length ) {
-			mediaIds = $controlTarget.val();
-			if ( ! mediaIds || -1 == mediaIds || '0' == mediaIds ) {
-				mediaIds = false;
+			selectedIds = $controlTarget.val();
+			if ( selectedIds && -1 !== selectedIds && '0' !== selectedIds ) {
+				mediaIds = selectedIds;
+				// @todo Account for multiple, comma-separated ids here.
+				
+				// Make sure the attachment is available when the media frame opens.
+				// @see https://core.trac.wordpress.org/ticket/22494
+				attachment = Attachment.get( mediaIds );
+				attachment.fetch();
 			}
-			// @todo Account for multiple, comma-separated ids here.
 		}
-		
-		title = $control.data('title') || BlazerSixMediaControl.frameTitle;
-		updateText = $control.data('update-text') || BlazerSixMediaControl.frameUpdateText;
-		
-		// Make sure the attachment is available when the media frame opens.
-		// @see https://core.trac.wordpress.org/ticket/22494
-		// @todo Account for multiple ids.
-		attachment = Attachment.get( mediaIds );
-		attachment.fetch();
 		
 		if ( frame ) {
 			if ( mediaIds ) {
@@ -90,14 +88,13 @@ jQuery(function($) {
 				type: 'image' // @todo Other types?
 				
 			},
-			multiple: $control.data( 'select-multiple' ) || false
+			multiple: $control.data( 'select-multiple' ) || false,
+			selection: ( mediaIds ) ? [ attachment ] : null
 		};
 		
-		if ( mediaIds ) {
-			options.selection = [ attachment ];
-		}
-		
 		frame = wp.media( options );
+		
+		frame.get('library').set( 'filterable', 'uploaded' );
 		
 		frame.toolbar.on( 'activate:select', function() {
 			frame.toolbar.view().set({
@@ -120,5 +117,7 @@ jQuery(function($) {
 				}
 			});
 		});
+		
+		frame.toolbar.mode('select');
 	});
 });
