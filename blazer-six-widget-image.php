@@ -116,10 +116,10 @@ class Blazer_Six_Widget_Image_Loader {
 	public static function admin_head_widgets() {
 		?>
 		<style type="text/css">
-		.widget .widget-inside .blazersix-widget-image-form .blazersix-media-control { padding: 10px; text-align: left; border: 1px dashed #aaa;}
+		.widget .widget-inside .blazersix-widget-image-form .blazersix-media-control { padding: 20px 0; text-align: center; border: 1px dashed #aaa;}
+		.widget .widget-inside .blazersix-widget-image-form .blazersix-media-control.has-image { padding: 10px; text-align: left; border: 1px dashed #aaa;}
 		.widget .widget-inside .blazersix-widget-image-form .blazersix-media-control img { display: block; margin-bottom: 10px; max-width: 100%; height: auto;}
 		.widget .widget-inside .blazersix-widget-image-form .blazersix-media-control img:not(.attachment-thumbnail) { width: 100%;}
-		.widget .widget-inside .blazersix-widget-image-form .blazersix-media-control.no-image { padding: 20px 0; text-align: center; border: 1px dashed #aaa;}
 		</style>
 		<?php
 	}
@@ -134,7 +134,7 @@ class Blazer_Six_Widget_Image_Loader {
 		?>
 		<script type="text/javascript">
 		jQuery(function($) {
-			$('#wpbody').on('selectionChange.blazersixMediaControl', '.blazersix-media-control', function( e, selection, test ) {
+			$('#wpbody').on('selectionChange.blazersix', '.blazersix-media-control', function( e, selection, test ) {
 				var $control = $( e.target ),
 					$sizeField = $control.closest('.blazersix-widget-image-form').find('select.image-size'),
 					model = selection.first(),
@@ -157,7 +157,7 @@ class Blazer_Six_Widget_Image_Loader {
 						
 				$control.find('img').remove().end()
 					.prepend( image )
-					.removeClass('no-image')
+					.addClass('has-image')
 					.find('a.blazersix-media-control-choose').removeClass('button-hero');
 			});
 		});

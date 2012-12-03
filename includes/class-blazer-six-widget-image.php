@@ -139,7 +139,7 @@ class Blazer_Six_Widget_Image extends WP_Widget {
 			// @todo Implement data-media-type="image|?|?".
 			// @todo Implement data-media-size="thumbnail|medium|full|etc".
 			?>
-			<p class="blazersix-widget-image-control blazersix-media-control<?php echo ( $image_id ) ? '' : ' no-image'; ?>"
+			<p class="blazersix-widget-image-control blazersix-media-control<?php echo ( $image_id ) ? ' has-image' : ''; ?>"
 				data-title="<?php esc_attr_e( 'Choose an Image for the Widget', 'blazersix-widget-image-i18n' ); ?>"
 				data-update-text="<?php esc_attr_e( 'Update Image', 'blazersix-widget-image-i18n' ); ?>"
 				data-target=".image-id"

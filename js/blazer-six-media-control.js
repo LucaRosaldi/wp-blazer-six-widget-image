@@ -82,19 +82,14 @@ jQuery(function($) {
 			return;
 		}
 		
-		options = {
+		frame = wp.media({
 			title: title,
 			library: {
 				type: 'image' // @todo Other types?
-				
 			},
 			multiple: $control.data( 'select-multiple' ) || false,
 			selection: ( mediaIds ) ? [ attachment ] : null
-		};
-		
-		frame = wp.media( options );
-		
-		frame.get('library').set( 'filterable', 'uploaded' );
+		});
 		
 		frame.toolbar.on( 'activate:select', function() {
 			frame.toolbar.view().set({
@@ -105,19 +100,21 @@ jQuery(function($) {
 					click: function() {
 						var selection = frame.state().get('selection');
 						
-						frame.close();
-						
 						// Insert the selected attachment ids into the target element.
 						if ( $controlTarget.length ) {
 							$controlTarget.val( selection.pluck('id') );
 						}
 						
-						$control.trigger( 'selectionChange.blazersixMediaControl', [ selection ] );
+						$control.trigger( 'selectionChange.blazersix', [ selection ] );
+						
+						frame.close();
 					}
 				}
 			});
 		});
 		
 		frame.toolbar.mode('select');
+		
+		frame.setState('library').open();
 	});
 });
