@@ -182,10 +182,10 @@ class Blazer_Six_Widget_Image_Loader {
 	 */
 	public static function get_image_size_names() {
 		return apply_filters( 'image_size_names_choose', array(
-			'thumbnail'   => __( 'Thumbnail', 'blazersix-widget-image-i18n' ),
-			'medium'      => __( 'Medium', 'blazersix-widget-image-i18n' ),
-			'large'       => __( 'Large', 'blazersix-widget-image-i18n' ),
-			'full'        => __( 'Full Size', 'blazersix-widget-image-i18n' )
+			'thumbnail' => __( 'Thumbnail', 'blazersix-widget-image-i18n' ),
+			'medium'    => __( 'Medium', 'blazersix-widget-image-i18n' ),
+			'large'     => __( 'Large', 'blazersix-widget-image-i18n' ),
+			'full'      => __( 'Full Size', 'blazersix-widget-image-i18n' )
 		) );
 	}
 }
