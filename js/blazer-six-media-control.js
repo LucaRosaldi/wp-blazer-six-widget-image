@@ -26,14 +26,12 @@
 })(jQuery);
 
 /**
- * Media control frame popup functionality.
+ * Media control frame popup.
  *
  * This script listens for a click on an element with a
  * 'blazersix-media-control-choose' class residing within an element with
  * class of 'blazersix-media-control'. When the click is detected it looks for
  * custom data attributes to modify the behavior of the media frame popup.
- *
- * @see post_thumbnail_meta_box()
  */
 jQuery(function($) {
 	var Attachment = wp.media.model.Attachment,
@@ -63,21 +61,14 @@ jQuery(function($) {
 			if ( selectedIds && -1 !== selectedIds && '0' !== selectedIds ) {
 				mediaIds = selectedIds;
 				// @todo Account for multiple, comma-separated ids here.
-				
 				// Make sure the attachment is available when the media frame opens.
-				// @see https://core.trac.wordpress.org/ticket/22494
 				attachment = Attachment.get( mediaIds );
 				attachment.fetch();
 			}
 		}
 		
 		if ( frame ) {
-			if ( mediaIds ) {
-				frame.state().get('selection').add( attachment );
-			} else {
-				frame.state().get('selection').clear();
-			}
-			
+			frame.state().get('selection').reset( attachment ? [ attachment ] : [] );
 			frame.open();
 			return;
 		}
@@ -88,11 +79,11 @@ jQuery(function($) {
 				type: 'image' // @todo Other types?
 			},
 			multiple: $control.data( 'select-multiple' ) || false,
-			selection: ( mediaIds ) ? [ attachment ] : null
+			selection: attachment ? [ attachment ] : []
 		});
 		
-		frame.toolbar.on( 'activate:select', function() {
-			frame.toolbar.view().set({
+		frame.on( 'toolbar:render:select', function( view ) {
+			view.set({
 				select: {
 					style: 'primary',
 					text: updateText,
@@ -112,8 +103,6 @@ jQuery(function($) {
 				}
 			});
 		});
-		
-		frame.toolbar.mode('select');
 		
 		frame.setState('library').open();
 	});

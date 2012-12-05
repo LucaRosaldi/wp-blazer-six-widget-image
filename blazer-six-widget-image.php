@@ -3,7 +3,7 @@
  * Plugin Name: Blazer Six Image Widget
  * Plugin URI: https://github.com/bradyvercher/wp-blazer-six-widget-image
  * Description: A simple image widget utilizing the new WordPress media manager.
- * Version: 0.1-beta
+ * Version: 0.1.1-beta
  * Author: Blazer Six, Inc.
  * Author URI: http://www.blazersix.com/
  * License: GPLv2 or later
@@ -31,6 +31,11 @@
  *
  * @todo Consider how to package as an include (paths need to be configurable).
  */
+
+/**
+ * Include the image widget class early to make it easy to extend.
+ */
+require_once( plugin_dir_path( __FILE__ ) . 'includes/class-blazer-six-widget-image.php' );
 
 /**
  * Load the plugin when plugins are loaded.
@@ -86,13 +91,11 @@ class Blazer_Six_Widget_Image_Loader {
 	}
 	
 	/**
-	 * Include and register the image widget.
+	 * Register the image widget.
 	 *
 	 * @since 0.1.0
 	 */
 	public static function register_widget() {
-		require( plugin_dir_path( __FILE__ ) . 'includes/class-blazer-six-widget-image.php' );
-		
 		register_widget( 'Blazer_Six_Widget_Image' );
 	}
 	

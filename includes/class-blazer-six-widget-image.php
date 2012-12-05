@@ -10,12 +10,25 @@ class Blazer_Six_Widget_Image extends WP_Widget {
 	/**
 	 * Setup widget options.
 	 *
+	 * Allows child classes to overload the defaults.
+	 *
 	 * @since 0.1.0
+	 * @see WP_Widget::construct()
 	 */
-	function __construct() {
-		$widget_options = array( 'classname' => 'widget_image', 'description' => __( 'An image from the media library', 'blazersix-widget-image-i18n' ) );
-		$control_options = array( 'width' => 300 );
-		parent::__construct( 'blazersix-widget-image', __( 'Image', 'blazersix-widget-image-i18n' ), $widget_options, $control_options );
+	function __construct( $id_base = false, $name = false, $widget_options = array(), $control_options = array() ) {
+		$id_base = ( $id_base ) ? $id_base : 'blazersix-widget-image';
+		$name = ( $name ) ? $name : __( 'Image', 'blazersix-widget-image-i18n' );
+		
+		$widget_options = wp_parse_args( $widget_options, array(
+			'classname'   => 'widget_image',
+			'description' => __( 'An image from the media library', 'blazersix-widget-image-i18n' )
+		) );
+		
+		$control_options = wp_parse_args( $control_options, array(
+			'width' => 300
+		) );
+		
+		parent::__construct( $id_base, $name, $widget_options, $control_options );
 		
 		// Flush widget group cache when an attachment is saved, deleted, or the theme is switched.
 		add_action( 'save_post', array( $this, 'flush_group_cache' ) );
@@ -24,7 +37,10 @@ class Blazer_Six_Widget_Image extends WP_Widget {
 	}
 	
 	/**
-	 * Widget front end display method.
+	 * Default widget front end display method.
+	 *
+	 * Filters the instance data, fetches the output, displays it, then caches
+	 * it. Overload or filter the render() method to modify output.
 	 *
 	 * @since 0.1.0
 	 */
@@ -44,13 +60,6 @@ class Blazer_Six_Widget_Image extends WP_Widget {
 		$instance['saved_text'] = $instance['text'];
 		$instance['text'] = apply_filters( 'widget_text', empty( $instance['text'] ) ? '' : $instance['text'], $instance, $this->id_base );
 		
-		$link_open = '';
-		$link_close = '';
-		if ( ! empty ( $instance['link'] ) ) {
-			$link_open = '<a href="' . esc_url( $instance['link'] ) . '">';
-			$link_close = '</a>';
-		}
-		
 		// Start building the output.
 		$output = '';
 		
@@ -61,44 +70,67 @@ class Blazer_Six_Widget_Image extends WP_Widget {
 		}
 		
 		if ( empty( $output ) ) {
-			
-			$output .= $args['before_widget'];
-				
-				// Allow custom output to override the default HTML.
-				if ( $inside = apply_filters( 'blazersix_widget_image_output', '', $args, $instance ) ) {
-					$output .= $inside;
-				} else {
-					$output .= ( empty( $instance['title'] ) ) ? '' : $args['before_title']. $instance['title'] . $args['after_title'];
-					
-					// Add the image.
-					if ( ! empty( $instance['image_id'] ) ) {
-						$image_size = ( ! empty( $instance['image_size'] ) ) ? $instance['image_size'] : apply_filters( 'blazersix_widget_image_output_default_size', 'medium' );
-						
-						$output .= sprintf( '<p>%s%s%s</p>',
-							$link_open,
-							wp_get_attachment_image( $instance['image_id'], $image_size ),
-							$link_close
-						);
-					}
-					
-					// Add the text.
-					if ( ! empty( $instance['text'] ) ) {
-						$output .= apply_filters( 'the_content', $instance['text'] );
-					}
-					
-					// Add a more link.
-					if ( ! empty( $link_open ) && ! empty( $instance['link_text'] ) ) {
-						$output .= '<p class="more">' . $link_open . $instance['link_text'] . $link_close . '</p>';
-					}
-				}
-			
-			$output .= $args['after_widget'];
+			$output = $this->render( $args, $instance );
 		}
 		
 		echo $output;
 		
 		$cache[ $this->id ] = $output;
 		wp_cache_set( 'blazersix_widget_image', array_filter( $cache ), 'widget' );
+	}
+	
+	/**
+	 * Generate the widget output.
+	 *
+	 * This is typically done in the widget() method, but moving it to a
+	 * separate method allows for the routine to be easily overloaded by a
+	 * class extending this one without having to reimplement all the caching
+	 * and filtering, or resorting to adding a filter, calling the parent
+	 * method, then removing the filter.
+	 *
+	 * @since 0.1.1
+	 */
+	function render( $args, $instance ) {
+		$link_open = '';
+		$link_close = '';
+		if ( ! empty ( $instance['link'] ) ) {
+			$link_open = '<a href="' . esc_url( $instance['link'] ) . '">';
+			$link_close = '</a>';
+		}
+		
+		$output = $args['before_widget'];
+			
+			// Allow custom output to override the default HTML.
+			if ( $inside = apply_filters( 'blazersix_widget_image_output', '', $args, $instance, $this->id_base ) ) {
+				$output .= $inside;
+			} else {
+				$output .= ( empty( $instance['title'] ) ) ? '' : $args['before_title']. $instance['title'] . $args['after_title'];
+				
+				// Add the image.
+				if ( ! empty( $instance['image_id'] ) ) {
+					$image_size = ( ! empty( $instance['image_size'] ) ) ? $instance['image_size'] : apply_filters( 'blazersix_widget_image_output_default_size', 'medium', $this->id_base );
+					
+					$output .= sprintf( '<p>%s%s%s</p>',
+						$link_open,
+						wp_get_attachment_image( $instance['image_id'], $image_size ),
+						$link_close
+					);
+				}
+				
+				// Add the text.
+				if ( ! empty( $instance['text'] ) ) {
+					$output .= apply_filters( 'the_content', $instance['text'] );
+				}
+				
+				// Add a more link.
+				if ( ! empty( $link_open ) && ! empty( $instance['link_text'] ) ) {
+					$output .= '<p class="more">' . $link_open . $instance['link_text'] . $link_close . '</p>';
+				}
+			}
+		
+		$output .= $args['after_widget'];
+		
+		return $output;
 	}
 
 	/**
@@ -123,12 +155,12 @@ class Blazer_Six_Widget_Image extends WP_Widget {
 		$image_id = $instance['image_id'];
 		
 		// The order of fields can be modified, new fields can be registered, or existing fields can be removed here.
-		$fields = (array) apply_filters( 'blazersix_widget_image_fields', array( 'image_size', 'link', 'link_text', 'text') );
+		$fields = (array) apply_filters( 'blazersix_widget_image_fields', $this->form_fields(), $this->id_base );
 		?>
 		
 		<div class="blazersix-widget-image-form">
 			
-			<?php do_action( 'blazersix_widget_image_form_before', $instance ); ?>
+			<?php do_action( 'blazersix_widget_image_form_before', $instance, $this->id_base ); ?>
 			
 			<p>
 				<label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Title:', 'blazersix-widget-image-i18n' ); ?></label>
@@ -207,16 +239,27 @@ class Blazer_Six_Widget_Image extends WP_Widget {
 						
 						default :
 							// Custom fields can be added using this action.
-							do_action( 'blazersix_widget_image_field-' . sanitize_key( $field ), $this, $instance );
+							do_action( 'blazersix_widget_image_field-' . sanitize_key( $field ), $instance, $this );
 					}
 				}
 			}
 			
-			do_action( 'blazersix_widget_image_form_after', $instance );
+			do_action( 'blazersix_widget_image_form_after', $instance, $this->id_base );
 			?>
 			
 		</div>
 		<?php
+	}
+	
+	/**
+	 * The list of extra fields that should be shown in the widget form.
+	 *
+	 * Can be easily overloaded by a child class.
+	 *
+	 * @since 0.1.1
+	 */
+	function form_fields() {
+		return array( 'image_size', 'link', 'link_text', 'text' );
 	}
 	
 	/**
@@ -227,7 +270,7 @@ class Blazer_Six_Widget_Image extends WP_Widget {
 	function update( $new_instance, $old_instance ) {
 		$instance = wp_parse_args( $new_instance, $old_instance );
 		
-		$instance = apply_filters( 'blazersix_widget_image_instance', $instance, $new_instance, $old_instance );
+		$instance = apply_filters( 'blazersix_widget_image_instance', $instance, $new_instance, $old_instance, $this->id_base );
 		
 		$instance['title'] = wp_strip_all_tags( $new_instance['title'] );
 		$instance['image_id'] = absint( $new_instance['image_id'] );
